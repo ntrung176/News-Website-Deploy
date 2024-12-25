@@ -1,0 +1,153 @@
+{{#section "title"}}Thông tin cá nhân - {{/section}}
+
+<div class="card mx-auto" style="max-width: 800px;">
+  <div class="card-body bg-light">
+    <div class="row align-items-center">
+      <div class="col-sm-1 text-center">
+        <img
+          src="/public/images/noavatar.jpg"
+          alt="Avatar của {{this.user.UserName}}"
+          height="60"
+          width="60"
+          class="rounded-circle"
+        />
+      </div>
+      <div class="col-sm-11">
+        <h4 class="mb-1">{{this.user.UserName}}</h4>
+        <p class="mb-1">Số dư: {{this.user.tien}} VNĐ</p>
+        <p>
+          {{#if qUser}}
+            <span class="badge badge-primary">Người dùng</span>
+          {{/if}}
+          {{#if qWriter}}
+            <span class="badge badge-secondary">Phóng viên</span>
+          {{/if}}
+          {{#if qEditor}}
+            <span class="badge badge-info">Biên tập viên</span>
+          {{/if}}
+          {{#if qAdmin}}
+            <span class="badge badge-danger">Quản trị viên</span>
+          {{/if}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#if naptien_success}}
+  <div class="alert alert-success mt-4" role="alert">
+    Bạn vừa nạp
+    {{this.tienvuanap}}
+    VNĐ vào tài khoản.
+  </div>
+{{/if}}
+
+{{#if edit_success}}
+  <div class="alert alert-success mt-4" role="alert">
+    Bạn vừa cập nhật thông tin cá nhân thành công.
+  </div>
+{{/if}}
+
+<ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a
+      class="nav-link active"
+      id="home-tab"
+      data-toggle="tab"
+      href="#home"
+      role="tab"
+      aria-controls="home"
+      aria-selected="true"
+    >Thông tin cá nhân</a>
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      id="naptien-tab"
+      data-toggle="tab"
+      href="#naptien"
+      role="tab"
+      aria-controls="naptien"
+      aria-selected="false"
+    >Nạp tiền</a>
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      id="premium-tab"
+      data-toggle="tab"
+      href="#premium"
+      role="tab"
+      aria-controls="premium"
+      aria-selected="false"
+    >Đăng kí Premium</a>
+  </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+  <!-- Thông tin cá nhân -->
+  <div
+    class="tab-pane fade show active card card-body"
+    id="home"
+    role="tabpanel"
+    aria-labelledby="home-tab"
+  >
+    <p><strong>Họ tên:</strong> {{this.user.Fullname}}</p>
+    <p><strong>Số điện thoại:</strong> {{this.user.Phone}}</p>
+    <p><strong>Email:</strong> {{this.user.Email}}</p>
+    <p><strong>Địa chỉ:</strong> {{this.user.Address}}</p>
+    <p><strong>Ngày sinh:</strong> {{this.user.F_DOB}}</p>
+    <a href="/profile/edit" class="btn btn-success mt-3"><i
+        class="fas fa-edit"
+      ></i>
+      Chỉnh sửa thông tin</a>
+  </div>
+
+  <!-- Nạp tiền -->
+  <div
+    class="tab-pane fade card card-body"
+    id="naptien"
+    role="tabpanel"
+    aria-labelledby="naptien-tab"
+  >
+    <form action="/naptien" method="POST">
+      <div class="form-group">
+        <label for="txtTien">Nhập số tiền bạn muốn nạp vào tài khoản:</label>
+        <input
+          type="number"
+          name="tien"
+          id="txtTien"
+          class="form-control"
+          min="1"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-success"><i
+          class="fas fa-money-bill-wave"
+        ></i>
+        Nạp tiền</button>
+    </form>
+  </div>
+
+  <!-- Đăng kí Premium -->
+  <div
+    class="tab-pane fade card card-body"
+    id="premium"
+    role="tabpanel"
+    aria-labelledby="premium-tab"
+  >
+    <h5>Dịch vụ đăng kí tài khoản Premium</h5>
+    <p><strong>Quyền lợi Premium:</strong></p>
+    <ul>
+      <li>Xem bài viết Premium</li>
+      <li>Không quảng cáo</li>
+      <li>Truy cập sớm các tính năng mới</li>
+      <li>...</li>
+    </ul>
+    <p><strong>Hạn sử dụng:</strong> 7 ngày</p>
+    <a href="/premium" class="btn btn-success"><i class="fas fa-user-plus"></i>
+      Đăng kí Premium</a>
+    <a href="/profile" class="btn btn-danger"><i class="fas fa-times"></i>
+      Quay lại</a>
+  </div>
+</div>

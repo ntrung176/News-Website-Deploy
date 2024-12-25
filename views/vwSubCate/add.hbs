@@ -1,0 +1,69 @@
+{{#section 'title'}}Thêm chuyên mục con - {{this.category.CName}} - {{/section}}
+
+<div class="row mt-4">
+    <!-- Sidebar Admin Panel -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-light">
+                Admin Panel
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="/admin/categories" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-circle-right mr-2"></i> Quản lý chuyên mục
+                </a>
+                <a href="/admin/posts" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-circle-right mr-2"></i> Quản lý bài đăng
+                </a>
+                <a href="/admin/users" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-circle-right mr-2"></i> Quản lý người dùng
+                </a>
+                <!-- Thêm các liên kết quản lý khác tại đây nếu cần -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-success text-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <a href="/admin/categories/{{this.category.CID}}" class="text-light">
+                        {{this.category.CName}}
+                    </a> 
+                    > Thêm chuyên mục nhỏ
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/subcategories/add">
+                    <div class="form-group">
+                        <label for="txtSCName">Tên chuyên mục nhỏ</label>
+                        <input 
+                            type="text" 
+                            class="form-control {{#if this.invalid_SCName}}is-invalid{{/if}}" 
+                            id="txtSCName" 
+                            name="SCName" 
+                            placeholder="Nhập tên chuyên mục nhỏ" 
+                            required 
+                            autofocus
+                            value="{{this.input.SCName}}"
+                        >
+                        {{#if this.invalid_SCName}}
+                            <div class="invalid-feedback">
+                                Tên chuyên mục nhỏ đã tồn tại. Vui lòng chọn tên khác.
+                            </div>
+                        {{/if}}
+                    </div>
+                    <input type="hidden" name="CID" value="{{this.category.CID}}">
+                    <div class="d-flex justify-content-between">
+                        <a href="/admin/categories/{{this.category.CID}}/subcategories" class="btn btn-secondary">
+                            <i class="fa fa-backward mr-2" aria-hidden="true"></i> Quay lại danh sách
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check mr-2" aria-hidden="true"></i> Thêm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

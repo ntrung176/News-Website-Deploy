@@ -1,0 +1,80 @@
+{{#section 'title'}}Quản lý chuyên mục - {{/section}}
+
+<div class="row mt-4">
+    <!-- Sidebar Admin Panel -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header bg-success text-light">
+                Admin Panel
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="/admin/posts" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-circle-right mr-2"></i> Quản lý bài đăng
+                </a>
+                <a href="/admin/users" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-circle-right mr-2"></i> Quản lý người dùng
+                </a>
+                <!-- Thêm các liên kết quản lý khác tại đây nếu cần -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-success text-light">
+                <h4 class="mb-0">Chuyên mục lớn</h4>
+                <a href="/admin/categories/add" class="btn btn-outline-light">
+                    <i class="fa fa-plus mr-2" aria-hidden="true"></i> Thêm chuyên mục lớn
+                </a>
+            </div>
+
+            {{#if this.empty}}
+                <div class="card-body">
+                    <p class="card-text">Không có dữ liệu.</p>
+                </div>
+            {{else}}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Tên chuyên mục lớn</th>
+                                <th scope="col" class="text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each this.categories}}
+                                <tr class="{{#if del}}table-danger{{/if}}">
+                                    <td>{{CID}}</td>
+                                    <td>{{CName}}</td>
+                                    <td class="text-right">
+                                        <a href="/admin/categories/edit/{{CID}}" class="btn btn-primary btn-sm mr-1" title="Sửa chuyên mục">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                        <a href="/admin/subcategories/{{CID}}" class="btn btn-info btn-sm mr-1" title="Quản lý chuyên mục con">
+                                            <i class="fas fa-arrow-circle-right"></i>
+                                        </a>
+                                        
+                                        {{#if del}}
+                                            <a href="/admin/categories/restore/{{CID}}" class="btn btn-success btn-sm mr-1" title="Khôi phục chuyên mục">
+                                                <i class="fas fa-trash-restore"></i>
+                                            </a>
+                                            <a href="/admin/categories/delete/{{CID}}" class="btn btn-danger btn-sm" title="Xóa vĩnh viễn chuyên mục" onclick="return confirm('Bạn có chắc chắn muốn xóa chuyên mục này?');">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        {{else}}
+                                            <a href="/admin/categories/del/{{CID}}" class="btn btn-danger btn-sm" title="Xóa chuyên mục" onclick="return confirm('Bạn có chắc chắn muốn xóa chuyên mục này?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        {{/if}}
+                                    </td>
+                                </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

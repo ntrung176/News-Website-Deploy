@@ -1,0 +1,74 @@
+{{#section "title"}}Di chuyển bài đăng - Quản lý bài đăng{{/section}}
+
+<div class="container mt-4">
+  <h2>Di chuyển bài đăng</h2>
+  <hr />
+
+  <!-- Thông tin bài đăng hiện tại -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      Thông tin bài đăng
+    </div>
+    <div class="card-body">
+      <p><strong>ID:</strong> {{post.PostID}}</p>
+      <p><strong>Tiêu đề:</strong> {{post.PostTitle}}</p>
+      <p><strong>Chuyên mục hiện tại:</strong> {{cate_post.CName}}</p>
+      <p><strong>Phân loại con hiện tại:</strong> {{sub_post.SCName}}</p>
+    </div>
+  </div>
+
+  <!-- Form di chuyển bài đăng -->
+  <form
+    id="movePostForm"
+    action="/admin/posts/move/{{post.PostID}}/tocat"
+    method="POST"
+  >
+    <div class="form-group">
+      <label for="newCategory">Chọn chuyên mục mới:</label>
+      <select class="form-control" id="newCategory" name="newCategory" required>
+        <option value="">-- Chọn chuyên mục --</option>
+        {{#each categories}}
+          <option value="{{CID}}">{{CName}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="newSubcategory">Chọn phân loại con mới:</label>
+      <select class="form-control" id="newSubcategory" name="newSubcategory">
+        <option value="">-- Chọn phân loại con --</option>
+        <!-- Phân loại con sẽ được thêm dựa trên chuyên mục được chọn -->
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Di chuyển</button>
+    <a href="/admin/posts" class="btn btn-secondary">Hủy</a>
+  </form>
+</div>
+
+<!-- Script để xử lý chọn chuyên mục và cập nhật phân loại con -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () { // Dữ liệu các
+  chuyên mục và phân loại con từ Handlebars const categories =
+  {{{categoriesJson}}}; // Sử dụng triple curly braces để chèn JSON trực tiếp
+  console.log("Categories JSON:", categories); // Thêm dòng này để kiểm tra
+  const newCategorySelect = document.getElementById('newCategory'); const
+  newSubcategorySelect = document.getElementById('newSubcategory'); const
+  movePostForm = document.getElementById('movePostForm'); // Cập nhật phân loại
+  con khi chọn chuyên mục mới newCategorySelect.addEventListener('change',
+  function () { const selectedCID = parseInt(this.value, 10);
+  newSubcategorySelect.innerHTML = '<option value="">-- Chọn phân loại con
+  --</option>'; if (!isNaN(selectedCID)) { const selectedCategory =
+  categories.find(cat => cat.CID === selectedCID); if (selectedCategory &&
+  selectedCategory.subcategories.length > 0) {
+  selectedCategory.subcategories.forEach(function (subcat) { const option =
+  document.createElement('option'); option.value = subcat.SCID; option.text =
+  subcat.SCName; newSubcategorySelect.appendChild(option); }); } } }); // Xử lý
+  submit form để thêm CID vào URL nếu cần
+  movePostForm.addEventListener('submit', function (e) { const selectedCID =
+  newCategorySelect.value; const selectedSCID = newSubcategorySelect.value; if
+  (!selectedCID) { e.preventDefault(); alert('Vui lòng chọn chuyên mục mới.');
+  return; } // Nếu có phân loại con mới được chọn, thay đổi action của form if
+  (selectedSCID) { movePostForm.action = `/admin/posts/move/{{post.PostID}}/tosub/${selectedSCID}`;
+  } }); });
+</script>

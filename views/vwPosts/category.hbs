@@ -1,0 +1,65 @@
+<div class="tab-pane fade show active card card-body" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Bài viết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each posts}}
+                        <tr class="{{#if Delete}}table-danger{{/if}}">
+                            <td>{{PostID}}</td>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <img src="/public/images/avatarPost/{{PostID}}.png" alt="{{PostTitle}}" class="img-fluid rounded" style="width:120px; height:100px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>{{PostTitle}}</strong><br/>
+                                        <span class="badge badge-light text-secondary">{{CName}} {{SCName}}</span>
+                                        <span class="badge badge-light text-secondary">{{Time}}</span>
+                                        <span class="badge badge-light text-secondary">{{StatusPost}}</span>
+                                        <span class="badge badge-light text-secondary">{{F_TimePublic}}</span>
+                                        {{#if Reason}}
+                                            <span class="badge badge-light text-secondary">Lí do: {{Reason}}</span>
+                                        {{/if}}
+                                        {{#if Pre}}
+                                            <span class="badge badge-danger text-white">Bài viết Premium</span>
+                                        {{/if}}
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <a href="/admin/posts/edit/{{PostID}}" class="btn btn-primary btn-sm mr-1" title="Sửa bài đăng">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                        <a href="/admin/posts/{{PostID}}" class="btn btn-info btn-sm mr-1" title="Xem bài đăng">
+                                            <i class="fas fa-arrow-circle-right"></i>
+                                        </a>
+                                        <a href="/admin/posts/move/{{PostID}}" class="btn btn-secondary btn-sm mr-1" title="Di chuyển bài đăng">
+                                            <i class="fas fa-file-import"></i>
+                                        </a>
+                                        <a href="/admin/posts/upload/{{PostID}}" class="btn btn-warning btn-sm mr-1" title="Tải lên bài đăng">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </a>
+                                        {{#if Delete}}
+                                            <a href="/admin/posts/restore/{{PostID}}" class="btn btn-success btn-sm mr-1" title="Khôi phục bài đăng" onclick="return confirm('Bạn có chắc chắn muốn khôi phục bài đăng này?');">
+                                                <i class="fas fa-trash-restore"></i>
+                                            </a>
+                                            <a href="/admin/posts/delete/{{PostID}}" class="btn btn-danger btn-sm" title="Xóa vĩnh viễn bài đăng" onclick="return confirm('Bạn có chắc chắn muốn xóa bài đăng này vĩnh viễn?');">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        {{else}}
+                                            <a href="/admin/posts/del/{{PostID}}" class="btn btn-danger btn-sm" title="Xóa bài đăng" onclick="return confirm('Bạn có chắc chắn muốn xóa bài đăng này?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+</div>

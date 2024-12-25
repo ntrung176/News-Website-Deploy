@@ -1,0 +1,102 @@
+{{#section "title"}}Đăng ký thành viên mới - {{/section}}
+{{#section "js"}}
+  <script
+    src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+  ></script>
+
+  <script>
+    function isNumber(n) { return /^-?\d+$/.test(n); } function Check() { var
+    username = $('#txtUserName').val().trim(); var pass =
+    $('#txtPassword').val(); var cpass = $('#txtCPassword').val(); var phone =
+    $('#txtPhone').val().trim(); var phonePattern = /^[0-9]{10,15}$/; if
+    (username.length < 5) { alert('Tên người dùng không được dưới 5 kí tự');
+    return false; } if (pass.length < 6) { alert('Mật khẩu không được đặt dưới 6
+    kí tự'); return false; } if (pass !== cpass) { alert('Mật khẩu xác nhận
+    không khớp'); return false; } if (!isNumber(phone)) { alert('Vui lòng nhập
+    lại đúng định dạng số điện thoại'); return false; } if
+    (!phonePattern.test(phone)) { alert('Vui lòng nhập lại đúng định dạng số
+    điện thoại'); return false; } return true; }
+  </script>
+{{/section}}
+
+<div class="card mx-auto" style="max-width: 600px;">
+  <div class="card-header text-success">
+    <strong>Chỉnh sửa Thông tin cá nhân</strong>
+  </div>
+  <form method="POST" id="frmEditProfile">
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="Fullname">Họ và tên</label>
+          <input
+            type="text"
+            name="Fullname"
+            id="Fullname"
+            class="form-control"
+            value="{{this.user.Fullname}}"
+            required
+          />
+        </div>
+        <div class="form-group col-md-6">
+          <label for="Address">Địa chỉ</label>
+          <input
+            type="text"
+            name="Address"
+            id="Address"
+            class="form-control"
+            value="{{this.user.Address}}"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="Phone">Số điện thoại</label>
+          <input
+            type="text"
+            name="Phone"
+            id="Phone"
+            class="form-control"
+            value="{{this.user.Phone}}"
+            required
+          />
+        </div>
+        <div class="form-group col-md-6">
+          <label for="Email">Thư điện tử</label>
+          <input
+            type="email"
+            name="Email"
+            id="Email"
+            class="form-control"
+            value="{{this.user.Email}}"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="F_DOB">Ngày sinh</label>
+        <input
+          type="date"
+          name="F_DOB"
+          id="F_DOB"
+          class="form-control"
+          value="{{this.user.F_DOB}}"
+          required
+        />
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <a href="/profile" class="btn btn-danger"><i
+            class="fas fa-backward"
+          ></i>
+          Quay lại</a>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-save"></i>
+          Lưu
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,516 @@
+{{#section "title"}}Quản lý bài đăng - {{/section}}
+
+<div class="row mt-4">
+  <!-- Sidebar: Danh sách chuyên mục -->
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-header bg-success text-light">Chuyên mục bạn quản lí</div>
+      <div class="list-group list-group-flush">
+        {{#each list}}
+          <a
+            href="/admin/posts/cat/{{CID}}/post"
+            class="list-group-item list-group-item-action"
+          >
+            <i class="fab fa-buffer mr-2"></i>
+            {{CName}}
+          </a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content: Các bài đăng theo trạng thái -->
+  <div class="col-sm-9">
+    <div class="card">
+      <div class="card-header bg-success text-light">
+        <h4 class="mb-0">Bài đăng</h4>
+      </div>
+
+      <div class="card-body">
+        <!-- Nav Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a
+              class="nav-link active"
+              id="all-posts-tab"
+              data-toggle="tab"
+              href="#all-posts"
+              role="tab"
+              aria-controls="all-posts"
+              aria-selected="true"
+            >Tất cả bài đăng</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="pending-tab"
+              data-toggle="tab"
+              href="#pending"
+              role="tab"
+              aria-controls="pending"
+              aria-selected="false"
+            >Chưa được duyệt</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="rejected-tab"
+              data-toggle="tab"
+              href="#rejected"
+              role="tab"
+              aria-controls="rejected"
+              aria-selected="false"
+            >Bị từ chối</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="waiting-publication-tab"
+              data-toggle="tab"
+              href="#waiting-publication"
+              role="tab"
+              aria-controls="waiting-publication"
+              aria-selected="false"
+            >Đang chờ xuất bản</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="published-tab"
+              data-toggle="tab"
+              href="#published"
+              role="tab"
+              aria-controls="published"
+              aria-selected="false"
+            >Đã xuất bản</a>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="myTabContent">
+
+          <!-- All Posts Tab -->
+          <div
+            class="tab-pane fade show active"
+            id="all-posts"
+            role="tabpanel"
+            aria-labelledby="all-posts-tab"
+          >
+            {{#if post.length}}
+              <div class="table-responsive">
+                <table class="table table-hover mt-3">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Bài viết</th>
+                      <th scope="col">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each post}}
+                      <tr>
+                        <td>{{PostID}}</td>
+                        <td>
+                          <div class="row align-items-center">
+                            <div class="col-sm-2">
+                              <img
+                                src="/images/avatarPost/{{PostID}}.png"
+                                alt="Avatar của {{PostTitle}}"
+                                class="img-fluid rounded"
+                              />
+                            </div>
+                            <div class="col-sm-6">
+                              <strong>{{PostTitle}}</strong><br />
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{CName}} {{SCName}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{Time}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{NameStatus}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{TimePublic}}</span>
+                              {{#if Reason}}
+                                <span class="badge badge-pill badge-warning">Lí
+                                  do:
+                                  {{Reason}}</span>
+                              {{/if}}
+                            </div>
+                            <div class="col-sm-4 text-right">
+                              <a
+                                href="/admin/posts/move/{{PostID}}"
+                                class="btn btn-primary btn-sm"
+                                title="Di chuyển"
+                              ><i class="fas fa-file-import"></i></a>
+                              <a
+                                href="/admin/posts/status/{{PostID}}"
+                                class="btn btn-info btn-sm"
+                                title="Cập nhật trạng thái"
+                              ><i class="fas fa-clipboard-check"></i></a>
+                              <a
+                                href="/post/{{PostID}}"
+                                class="btn btn-success btn-sm"
+                                title="Xem bài viết"
+                              ><i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <!-- Optional: Additional actions can be placed here -->
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{else}}
+              <div class="text-center my-4">
+                <p>Không có dữ liệu.</p>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Pending Tab -->
+          <div
+            class="tab-pane fade"
+            id="pending"
+            role="tabpanel"
+            aria-labelledby="pending-tab"
+          >
+            {{#if post_ChuaDuyet.length}}
+              <div class="table-responsive">
+                <table class="table table-hover mt-3">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Bài viết</th>
+                      <th scope="col">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each post_ChuaDuyet}}
+                      <tr>
+                        <td>{{PostID}}</td>
+                        <td>
+                          <div class="row align-items-center">
+                            <div class="col-sm-2">
+                              <img
+                                src="/images/avatarPost/{{PostID}}.png"
+                                alt="Avatar của {{PostTitle}}"
+                                class="img-fluid rounded"
+                              />
+                            </div>
+                            <div class="col-sm-6">
+                              <strong>{{PostTitle}}</strong><br />
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{CName}} {{SCName}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{Time}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{NameStatus}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{TimePublic}}</span>
+                              {{#if Reason}}
+                                <span class="badge badge-pill badge-warning">Lí
+                                  do:
+                                  {{Reason}}</span>
+                              {{/if}}
+                            </div>
+                            <div class="col-sm-4 text-right">
+                              <a
+                                href="/admin/posts/move/{{PostID}}"
+                                class="btn btn-primary btn-sm"
+                                title="Di chuyển"
+                              ><i class="fas fa-file-import"></i></a>
+                              <a
+                                href="/admin/posts/status/{{PostID}}"
+                                class="btn btn-info btn-sm"
+                                title="Cập nhật trạng thái"
+                              ><i class="fas fa-clipboard-check"></i></a>
+                              <a
+                                href="/post/{{PostID}}"
+                                class="btn btn-success btn-sm"
+                                title="Xem bài viết"
+                              ><i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <!-- Optional: Additional actions can be placed here -->
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{else}}
+              <div class="text-center my-4">
+                <p>Không có dữ liệu.</p>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Rejected Tab -->
+          <div
+            class="tab-pane fade"
+            id="rejected"
+            role="tabpanel"
+            aria-labelledby="rejected-tab"
+          >
+            {{#if post_TuChoi.length}}
+              <div class="table-responsive">
+                <table class="table table-hover mt-3">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Bài viết</th>
+                      <th scope="col">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each post_TuChoi}}
+                      <tr>
+                        <td>{{PostID}}</td>
+                        <td>
+                          <div class="row align-items-center">
+                            <div class="col-sm-2">
+                              <img
+                                src="/images/avatarPost/{{PostID}}.png"
+                                alt="Avatar của {{PostTitle}}"
+                                class="img-fluid rounded"
+                              />
+                            </div>
+                            <div class="col-sm-6">
+                              <strong>{{PostTitle}}</strong><br />
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{CName}} {{SCName}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{Time}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{NameStatus}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{TimePublic}}</span>
+                              {{#if Reason}}
+                                <span class="badge badge-pill badge-warning">Lí
+                                  do:
+                                  {{Reason}}</span>
+                              {{/if}}
+                            </div>
+                            <div class="col-sm-4 text-right">
+                              <a
+                                href="/admin/posts/move/{{PostID}}"
+                                class="btn btn-primary btn-sm"
+                                title="Di chuyển"
+                              ><i class="fas fa-file-import"></i></a>
+                              <a
+                                href="/admin/posts/status/{{PostID}}"
+                                class="btn btn-info btn-sm"
+                                title="Cập nhật trạng thái"
+                              ><i class="fas fa-clipboard-check"></i></a>
+                              <a
+                                href="/post/{{PostID}}"
+                                class="btn btn-success btn-sm"
+                                title="Xem bài viết"
+                              ><i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <!-- Optional: Additional actions can be placed here -->
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{else}}
+              <div class="text-center my-4">
+                <p>Không có dữ liệu.</p>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Waiting Publication Tab -->
+          <div
+            class="tab-pane fade"
+            id="waiting-publication"
+            role="tabpanel"
+            aria-labelledby="waiting-publication-tab"
+          >
+            {{#if post_ChoXuatBan.length}}
+              <div class="table-responsive">
+                <table class="table table-hover mt-3">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Bài viết</th>
+                      <th scope="col">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each post_ChoXuatBan}}
+                      <tr>
+                        <td>{{PostID}}</td>
+                        <td>
+                          <div class="row align-items-center">
+                            <div class="col-sm-2">
+                              <img
+                                src="/images/avatarPost/{{PostID}}.png"
+                                alt="Avatar của {{PostTitle}}"
+                                class="img-fluid rounded"
+                              />
+                            </div>
+                            <div class="col-sm-6">
+                              <strong>{{PostTitle}}</strong><br />
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{CName}} {{SCName}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{Time}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{NameStatus}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{TimePublic}}</span>
+                              {{#if Reason}}
+                                <span class="badge badge-pill badge-warning">Lí
+                                  do:
+                                  {{Reason}}</span>
+                              {{/if}}
+                            </div>
+                            <div class="col-sm-4 text-right">
+                              <a
+                                href="/admin/posts/move/{{PostID}}"
+                                class="btn btn-primary btn-sm"
+                                title="Di chuyển"
+                              ><i class="fas fa-file-import"></i></a>
+                              <a
+                                href="/admin/posts/status/{{PostID}}"
+                                class="btn btn-info btn-sm"
+                                title="Cập nhật trạng thái"
+                              ><i class="fas fa-clipboard-check"></i></a>
+                              <a
+                                href="/post/{{PostID}}"
+                                class="btn btn-success btn-sm"
+                                title="Xem bài viết"
+                              ><i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <!-- Optional: Additional actions can be placed here -->
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{else}}
+              <div class="text-center my-4">
+                <p>Không có dữ liệu.</p>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Published Tab -->
+          <div
+            class="tab-pane fade"
+            id="published"
+            role="tabpanel"
+            aria-labelledby="published-tab"
+          >
+            {{#if post_XuatBan.length}}
+              <div class="table-responsive">
+                <table class="table table-hover mt-3">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Bài viết</th>
+                      <th scope="col">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each post_XuatBan}}
+                      <tr>
+                        <td>{{PostID}}</td>
+                        <td>
+                          <div class="row align-items-center">
+                            <div class="col-sm-2">
+                              <img
+                                src="/images/avatarPost/{{PostID}}.png"
+                                alt="Avatar của {{PostTitle}}"
+                                class="img-fluid rounded"
+                              />
+                            </div>
+                            <div class="col-sm-6">
+                              <strong>{{PostTitle}}</strong><br />
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{CName}} {{SCName}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{Time}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{NameStatus}}</span>
+                              <span
+                                class="badge badge-pill badge-secondary"
+                              >{{TimePublic}}</span>
+                              {{#if Reason}}
+                                <span class="badge badge-pill badge-warning">Lí
+                                  do:
+                                  {{Reason}}</span>
+                              {{/if}}
+                            </div>
+                            <div class="col-sm-4 text-right">
+                              <a
+                                href="/admin/posts/move/{{PostID}}"
+                                class="btn btn-primary btn-sm"
+                                title="Di chuyển"
+                              ><i class="fas fa-file-import"></i></a>
+                              <a
+                                href="/admin/posts/status/{{PostID}}"
+                                class="btn btn-info btn-sm"
+                                title="Cập nhật trạng thái"
+                              ><i class="fas fa-clipboard-check"></i></a>
+                              <a
+                                href="/post/{{PostID}}"
+                                class="btn btn-success btn-sm"
+                                title="Xem bài viết"
+                              ><i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <!-- Optional: Additional actions can be placed here -->
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{else}}
+              <div class="text-center my-4">
+                <p>Không có dữ liệu.</p>
+              </div>
+            {{/if}}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

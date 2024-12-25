@@ -1,0 +1,98 @@
+{{#section 'title'}}Đăng ký thành viên mới - {{/section}}
+{{#section 'js'}}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    function isNumber(n) { 
+        return /^-?\d+$/.test(n); 
+    } 
+
+    function Check() {
+        var username = $('#txtUserName').val().trim();
+        var pass = $('#txtPassword').val();
+        var cpass = $('#txtCPassword').val();
+        var phone = $('#txtPhone').val().trim();
+        var phonePattern = /^[0-9]{10,15}$/;
+
+        if (username.length < 5) {
+            alert('Tên người dùng không được dưới 5 kí tự');
+            return false;
+        }
+        if (pass.length < 6) {
+            alert('Mật khẩu không được đặt dưới 6 kí tự');
+            return false;
+        }
+        if (pass !== cpass) {
+            alert('Mật khẩu xác nhận không khớp');
+            return false;
+        }
+        if (!isNumber(phone)) {
+            alert('Vui lòng nhập lại đúng định dạng số điện thoại');
+            return false;
+        }
+        if (!phonePattern.test(phone)) {
+            alert('Vui lòng nhập lại đúng định dạng số điện thoại');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+{{/section}}
+
+<div class="card mx-auto" style="max-width: 600px;">
+    <div class="card-header text-success">
+        <h4 class="mb-0">Đăng kí thành viên</h4>
+    </div>
+    <div class="card-body">
+        {{#if this.invalid_username}}
+            <div class="alert alert-danger" role="alert">Tên người dùng đã tồn tại</div>
+        {{/if}}
+        {{#if this.invalid_mail}}
+            <div class="alert alert-danger" role="alert">Email này đã tồn tại</div>
+        {{/if}}
+        {{#if this.invalid_phone}}
+            <div class="alert alert-danger" role="alert">Số điện thoại này đã tồn tại</div>
+        {{/if}}
+        <form method="POST" action="" id="frmRegister" onsubmit="return Check()">
+            <div class="form-group">
+                <label for="txtUserName">Tên người dùng</label>
+                <input type="text" class="form-control {{#if this.invalid_username}}is-invalid{{/if}}" id="txtUserName" name="username" value="{{this.info.username}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtEmail">Email</label>
+                <input type="email" class="form-control {{#if this.invalid_mail}}is-invalid{{/if}}" id="txtEmail" name="email" value="{{this.info.email}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtPassword">Mật khẩu</label>
+                <input type="password" class="form-control" id="txtPassword" name="password" value="{{this.info.password}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtCPassword">Xác nhận mật khẩu</label>
+                <input type="password" class="form-control" id="txtCPassword" name="cpassword" value="{{this.info.cpassword}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtFullname">Họ tên</label>
+                <input type="text" class="form-control" id="txtFullname" name="fullname" value="{{this.info.fullname}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtPhone">Số điện thoại</label>
+                <input type="tel" class="form-control {{#if this.invalid_phone}}is-invalid{{/if}}" id="txtPhone" name="phone" value="{{this.info.phone}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtAddress">Địa chỉ</label>
+                <input type="text" class="form-control" id="txtAddress" name="address" value="{{this.info.address}}" required>
+            </div>
+            <div class="form-group">
+                <label for="txtDOB">Ngày sinh</label>
+                <input type="date" class="form-control" id="txtDOB" name="dob" value="{{this.info.dob}}" required>
+            </div>
+            <div class="d-flex justify-content-between">
+                <a href="/" class="btn btn-danger"><i class="fas fa-backward"></i></a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Đăng ký 
+                </button> 
+            </div>
+        </form>
+    </div>
+</div>

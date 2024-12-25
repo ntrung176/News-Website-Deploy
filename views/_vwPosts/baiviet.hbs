@@ -1,0 +1,148 @@
+{{#section "title"}}{{this.post.PostTitle}} - {{/section}}
+{{#section "js"}}
+  <div id="fb-root"></div>
+  <script>
+    (function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if
+    (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src =
+    "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+    fjs.parentNode.insertBefore(js, fjs); }(document, 'script',
+    'facebook-jssdk'));
+  </script>
+{{/section}}
+
+<p></p>
+{{#if premium}}
+  <div class="alert alert-danger" role="alert">
+    Bài viết chỉ dành cho tài khoản Premium
+  </div>
+{{else}}
+  <div class="card mb-4">
+    <div class="card-header border-bottom">
+      <h3>{{this.post.PostTitle}}</h3>
+      <div class="text-muted">
+        <small><strong>{{this.post.U_FullName}}</strong>, Theo
+          <a href="{{this.post.linksource}}" class="text-dark"><strong
+            >{{this.post.source}}</strong></a>
+          <i class="far fa-clock"></i>
+          {{this.post.Time}}
+          <span class="text-danger"><strong
+            >{{this.rows.Duyetbai}}</strong></span>
+        </small>
+      </div>
+      <div
+        class="fb-share-button mt-2"
+        data-href="{{BASE_URL}}/post/{{this.rows.PostID}}"
+        data-layout="button_count"
+      >
+      </div>
+    </div>
+    <div class="card-body">
+      <strong>{{this.post.SumContent}}</strong>
+      <p></p>
+      {{{this.post.Content}}}
+      <div class="text-right">
+        Theo
+        <a href="{{this.post.linksource}}" class="text-dark"><strong
+          >{{this.post.source}}</strong></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-success text-white">
+      <h4 class="mb-0">Bình luận</h4>
+    </div>
+    <div class="card-body">
+      {{#if lcIsAuthenticated}}
+        <form method="POST" id="frmComment">
+          <div class="form-group">
+            <textarea
+              name="comment"
+              id="txtComment"
+              cols="30"
+              rows="3"
+              class="form-control"
+              placeholder="Viết bình luận..."
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-success">Đăng</button>
+        </form>
+      {{else}}
+        <div class="text-center">
+          <a href="/dangnhap">Đăng nhập</a>
+          để bình luận
+        </div>
+      {{/if}}
+    </div>
+    <div class="card-body border-top" id="comment">
+      {{#if this.comment}}
+        {{#each this.comment}}
+          <div class="media mb-3">
+            <img
+              src="/public/images/noavatar.jpg"
+              class="mr-3 rounded-circle"
+              alt="{{username}}"
+              width="40"
+              height="40"
+            />
+            <div class="media-body">
+              <h5 class="mt-0"><a
+                  href="/users/profile/{{UID}}"
+                  class="text-dark"
+                >{{username}}</a></h5>
+              <p>{{Comment}}</p>
+              <small class="text-muted">
+                <a href="/comment/like/{{ComID}}" class="text-primary">Thích</a>
+                ·
+                {{Time}}
+              </small>
+            </div>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="text-center">Không có bình luận</div>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-success text-white">
+      <h4 class="mb-0">Tin cùng chuyên mục</h4>
+    </div>
+    <div class="card-body">
+      {{#if this.empty}}
+        <p>Không có tin nào</p>
+      {{else}}
+        {{#each this.tincungchuyenmuc}}
+          <div class="media mb-4">
+            <img
+              src="/public/images/avatarPost/{{PostID}}.png"
+              class="mr-3 rounded"
+              alt="{{PostTitle}}"
+              width="120"
+              height="90"
+            />
+            <div class="media-body">
+              <h5 class="mt-0"><a
+                  href="/post/{{PostID}}"
+                  class="text-dark"
+                >{{PostTitle}}</a></h5>
+              <p>
+                <a
+                  href="#"
+                  class="badge badge-light text-secondary"
+                >{{CName}}</a>
+                <a
+                  href="#"
+                  class="badge badge-light text-secondary"
+                >{{SCName}}</a>
+                <span class="badge badge-light text-secondary">{{Time}}</span>
+              </p>
+            </div>
+          </div>
+          <hr />
+        {{/each}}
+      {{/if}}
+    </div>
+  </div>
+{{/if}}

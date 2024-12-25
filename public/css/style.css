@@ -1,0 +1,250 @@
+/* Tổng quát */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu,
+    Cantarell, Oxygen, Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f8f9fa; /* Màu nền nhẹ nhàng */
+  color: #333; /* Màu chữ tối hơn để dễ đọc */
+  margin: 0;
+  padding: 0;
+}
+
+/* Thanh menu chính */
+#menu ul {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#menu li {
+  color: #f1f1f1;
+  display: inline-block;
+  padding: 0 15px;
+  line-height: 50px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background 0.3s, color 0.3s;
+}
+
+#menu li:first-child {
+  border-left: none;
+}
+
+#menu a {
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  font-weight: 500;
+}
+
+#menu li:hover {
+  background: #1e7e34;
+  color: #fff;
+}
+
+img {
+  max-width: 100%; /* Đảm bảo hình ảnh không vượt quá chiều rộng của phần tử chứa */
+  height: auto; /* Tự động điều chỉnh chiều cao dựa trên chiều rộng */
+  display: block; /* Loại bỏ khoảng cách thừa dưới ảnh */
+  object-fit: contain; /* Đảm bảo ảnh vừa với khung mà không bị cắt */
+}
+
+/* Các liên kết */
+a.tee:hover {
+  color: green;
+  text-decoration: underline;
+}
+
+/* Các nút click */
+a.click {
+  padding: 4px 5px;
+}
+
+a.click:hover {
+  background: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin: auto;
+}
+
+/* Khoảng cách */
+.khoangtrang {
+  margin-top: 15px;
+}
+
+/* Chuyên mục */
+.chuyenmuc,
+.tag {
+  border-left: 4px solid #28a745; /* Màu xanh lá cây */
+  padding-left: 10px;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.subcate {
+  color: #495057;
+  font-size: 14px;
+  padding-left: 20px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.subcate:hover {
+  color: #28a745; /* Màu xanh lá khi hover */
+}
+
+/* Các khoảng trống giữa các mục */
+.trong {
+  padding-bottom: 10px;
+}
+
+/* Modal */
+.fade-scale {
+  transform: scale(0);
+  opacity: 0;
+  transition: all 0.25s linear;
+}
+
+.fade-scale.in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-content {
+  border-radius: 10px;
+}
+
+.modal-dialog {
+  max-width: 500px; /* Điều chỉnh kích thước modal */
+}
+
+.modal-header2,
+.modal-footer2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.modal-footer2 {
+  justify-content: flex-end;
+}
+
+/* Nút Facebook */
+.facebook {
+  background-color: #3b5998;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.facebook:hover {
+  background-color: #2d4373;
+  text-decoration: none;
+}
+
+/* Banner */
+.banner,
+.slide {
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  padding: 15px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.banner img,
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Thanh tìm kiếm */
+.search {
+  width: 100%;
+  max-width: 600px; /* Giới hạn chiều rộng tối đa */
+  margin: 20px auto 0 auto; /* Di chuyển thanh tìm kiếm xuống và căn giữa */
+}
+
+.input-group {
+  width: 100%;
+}
+
+.input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-group .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .search {
+    margin-top: 150px; /* Giảm khoảng cách */
+  }
+}
+
+@media (max-width: 768px) {
+  /* Sắp xếp các phần tử theo chiều dọc */
+  header .d-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .search {
+    margin-top: 200px; /* Khoảng cách di chuyển xuống */
+    width: 100%;
+  }
+
+  /* Menu Chính */
+  #menu ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #menu li {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  #menu li:first-child {
+    border-top: none;
+  }
+
+  .subcate {
+    padding-left: 30px;
+  }
+
+  /* Căn chỉnh logo ở giữa */
+  .logo {
+    margin-bottom: 15px;
+  }
+}
+
+/* Z-Index Adjustments to Fix Overlapping Issues */
+.navbar {
+  z-index: 1000; /* Đảm bảo navbar luôn ở trên các phần tử khác */
+}
+
+.dropdown-menu {
+  z-index: 1050; /* Đảm bảo dropdown menu luôn trên navbar */
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -1px;
+}

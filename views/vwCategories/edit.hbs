@@ -1,0 +1,37 @@
+{{#section 'title'}}Chỉnh sửa chuyên mục {{this.category.CName}} - {{/section}}
+
+<div class="card mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">Sửa chuyên mục</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="/admin/categories/update">
+            <div class="form-group">
+                <label for="txtCID"><strong>ID</strong></label>
+                <input type="text" class="form-control" id="txtCID" name="CID" value="{{this.category.CID}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="txtCName">Tên chuyên mục</label>
+                <input type="text" class="form-control {{#if this.invalid_CName}}is-invalid{{/if}}" id="txtCName" name="CName" value="{{this.category.CName}}" required autofocus>
+                {{#if this.invalid_CName}}
+                    <div class="invalid-feedback">
+                        Tên chuyên mục đã tồn tại. Vui lòng chọn tên khác.
+                    </div>
+                {{/if}}
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a href="/admin/categories" class="btn btn-secondary" title="Quay lại danh sách">
+                        <i class="fa fa-backward mr-2" aria-hidden="true"></i> Quay lại
+                    </a>
+                    <a href="/admin/categories/del/{{this.category.CID}}" class="btn btn-danger" title="Xóa chuyên mục" onclick="return confirm('Bạn có chắc chắn muốn xóa chuyên mục này?');">
+                        <i class="fa fa-trash mr-2" aria-hidden="true"></i> Xóa
+                    </a>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-check mr-2" aria-hidden="true"></i> Lưu
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
