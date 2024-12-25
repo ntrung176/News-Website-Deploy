@@ -43,13 +43,6 @@ body {
   color: #fff;
 }
 
-img {
-  max-width: 100%; /* Đảm bảo hình ảnh không vượt quá chiều rộng của phần tử chứa */
-  height: auto; /* Tự động điều chỉnh chiều cao dựa trên chiều rộng */
-  display: block; /* Loại bỏ khoảng cách thừa dưới ảnh */
-  object-fit: contain; /* Đảm bảo ảnh vừa với khung mà không bị cắt */
-}
-
 /* Các liên kết */
 a.tee:hover {
   color: green;
@@ -131,6 +124,14 @@ a.click:hover {
 
 .modal-footer2 {
   justify-content: flex-end;
+}
+
+img {
+  max-width: 100%; /* Đảm bảo ảnh không vượt quá chiều rộng của vùng chứa */
+  height: auto; /* Giữ nguyên tỷ lệ của hình ảnh */
+  display: block; /* Loại bỏ khoảng trắng bên dưới hình ảnh nếu có */
+  margin: 0 auto; /* Căn giữa hình ảnh */
+  object-fit: contain; /* Đảm bảo ảnh vừa khít vùng chứa mà không bị cắt */
 }
 
 /* Nút Facebook */

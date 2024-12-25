@@ -161,6 +161,24 @@ router.get('/delete/:id', async function (req, res) {
     } else {
         res.redirect('/')
     }
-})
+}),
+router.get('/get-subcategories/:cid', async function (req, res) {
+    try {
+        const cid = parseInt(req.params.cid, 10);
+        if (isNaN(cid) || cid <= 0) {
+            return res.status(400).send('Invalid category ID');
+        }
+
+        // Lấy danh sách subcategories từ database cho CID
+        const subcategories = await subcategoryModel.singleforuser(cid);
+
+        // Trả về danh sách subcategories dưới dạng JSON
+        res.json(subcategories);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 module.exports = router;

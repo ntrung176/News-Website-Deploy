@@ -247,158 +247,7 @@ router.get("/edit/:pid", async function (req, res) {
     res.redirect("/"); // Redirect if the user isn't authenticated or lacks permission
   }
 });
-router.get("/move/:pid", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
-    const pid = +req.params.pid || -1;
-    const pst = await postModel.singleByPostID(pid);
 
-    if (!pst.length) {
-      return res.redirect("/admin/posts");
-    }
-
-    const post = pst[0];
-    const cate_post = await categoryModel.singleByCID(post.CID);
-    const subcate_post = await subcategoryModel.single2(post.SCID);
-    const sub_post = subcate_post[0];
-
-    // Fetch all categories and subcategories for moving the post
-    const category = await categoryModel.allforuser();
-    for (let i = 0; i < category.length; i++) {
-      const row = await subcategoryModel.singleforuser(category[i].CID);
-      category[i].subcategories = row;
-      category[i].PID = pid;
-      for (let j = 0; j < category[i].subcategories.length; j++) {
-        category[i].subcategories[j].PID = pid;
-      }
-    }
-
-    res.render("vwPosts/move", {
-      post,
-      cate_post,
-      sub_post,
-      category,
-    });
-  } else {
-    res.redirect("/"); // Redirect if the user is not authenticated or lacks permission
-  }
-});
-router.post("/move/:pid/tocat/:cid", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
-    const pid = +req.params.pid || -1;
-    const cid = +req.params.cid || -1;
-
-    const pst = await postModel.singleByPostID(pid);
-
-    if (!pst.length) {
-      return res.redirect("/admin/posts");
-    }
-
-    // Cập nhật CID cho bài viết
-    const updateResult = await postModel.updateCategory(pid, cid);
-
-    if (updateResult) {
-      req.flash("success", "Post has been moved to the new category.");
-      res.redirect(`/admin/posts/${pid}`);
-    } else {
-      req.flash("error", "Failed to move the post.");
-      res.redirect(`/admin/posts/${pid}`);
-    }
-  } else {
-    res.redirect("/"); // Redirect if not authenticated or not authorized
-  }
-});
-router.get("/move/:pid/tocat/:cid", async function (req, res) {
-  const pid = +req.params.pid || -1;
-  const cid = +req.params.cid || -1;
-
-  if (pid === -1 || cid === -1) {
-    return res.status(400).send("Invalid Post ID or Category ID.");
-  }
-
-  try {
-    // Kiểm tra bài viết có tồn tại
-    const pst = await postModel.singleByPostID(pid);
-    if (!pst || !pst.length) {
-      return res.status(404).send("Post not found.");
-    }
-
-    // Kiểm tra chuyên mục có tồn tại
-    const category = await categoryModel.singleByCID(cid);
-    if (!category || !category.length) {
-      return res.status(404).send("Category not found.");
-    }
-
-    // Cập nhật chuyên mục cho bài viết
-    const post = pst[0];
-    post.CID = cid; // Cập nhật chuyên mục cho bài viết
-    await postModel.update(post);
-
-    // Chuyển hướng về trang bài viết sau khi di chuyển
-    res.redirect(`/admin/posts/${post.PostID}`);
-  } catch (error) {
-    console.error("Error moving post:", error);
-    res.status(500).send("Error moving post.");
-  }
-});
-
-router.get("/move/:pid/tosub/:scid", async function (req, res) {
-  const pid = +req.params.pid || -1;
-  const scid = +req.params.scid || -1;
-
-  if (pid === -1 || scid === -1) {
-    return res.status(400).send("Invalid Post ID or Subcategory ID.");
-  }
-
-  try {
-    // Kiểm tra bài viết có tồn tại
-    const pst = await postModel.singleByPostID(pid);
-    if (!pst || !pst.length) {
-      return res.status(404).send("Post not found.");
-    }
-
-    // Kiểm tra phân loại con có tồn tại
-    const subcategory = await subcategoryModel.single(scid);
-    if (!subcategory || !subcategory.length) {
-      return res.status(404).send("Subcategory not found.");
-    }
-
-    // Cập nhật phân loại con cho bài viết
-    const post = pst[0];
-    post.SCID = scid;
-    await postModel.update(post);
-
-    // Chuyển hướng về trang bài viết sau khi di chuyển
-    res.redirect(`/admin/posts/${post.PostID}`);
-  } catch (error) {
-    console.error("Error moving post:", error);
-    res.status(500).send("Error moving post.");
-  }
-});
-router.post("/move/:pid/tosub/:scid", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
-    const pid = +req.params.pid || -1;
-    const scid = +req.params.scid || -1;
-
-    const pst = await postModel.updateSubcategory(pid);
-
-    if (!pst.length) {
-      return res.redirect("/admin/posts");
-    }
-
-    // Cập nhật SCID cho bài viết
-    const updateResult = await postModel.move(pid, scid);
-
-    if (updateResult) {
-      req.flash("success", "Post has been moved to the new subcategory.");
-      res.redirect(`/admin/posts/${pid}`);
-    } else {
-      req.flash("error", "Failed to move the post.");
-      res.redirect(`/admin/posts/${pid}`);
-    }
-  } else {
-    res.redirect("/"); // Redirect if not authenticated or not authorized
-  }
-});
 router.post("/update", async function (req, res) {
   // Debug dữ liệu từ req.body để kiểm tra
   console.log("Received req.body:", req.body);
@@ -407,6 +256,11 @@ router.post("/update", async function (req, res) {
   const post = {
     PostID: req.body.PostID, // Dữ liệu này từ input hidden
     PostTitle: req.body.PostTitle,
+
+    TimePost:
+      req.body.TimePost ||
+      new Date().toISOString().slice(0, 19).replace("T", " "), // Xử lý checkbox
+
     SumContent: req.body.SumContent,
     Content: req.body.Content,
     source: req.body.source,
@@ -415,7 +269,6 @@ router.post("/update", async function (req, res) {
     TimePost:
       req.body.F_TimePublic ||
       new Date().toISOString().slice(0, 19).replace("T", " "),
-    PostID: req.body.PostID, // Xử lý checkbox
   };
 
   // Kiểm tra tính hợp lệ của dữ liệu
@@ -492,7 +345,6 @@ router.get("/upload/:id", async function (req, res) {
 });
 const uploadDir = "public/images/avatarPost"; // Không cần phải có __dirname trong uploadDir // Xác định thư mục chính xác
 
-// Tạo đường dẫn đầy đủ từ __dirname và uploadDir
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log("Thư mục public/images đã được tạo");
@@ -542,128 +394,53 @@ router.post("/upload/:id", upload.single("fuMain"), (req, res) => {
   // Sau khi upload thành công, chuyển hướng hoặc trả về kết quả
   res.redirect(`/admin/posts/edit/${postID}`); // Ví dụ: quay lại trang chỉnh sửa bài viết
 });
+router.get("/del/:id", async function (req, res) {
+  if (req.isAuthenticated() && req.user.Permission === 3) {
+    const id = +req.params.id || -1;
 
-router.post("/delete/:id", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
-    try {
-      const postID = +req.params.id || -1;
-
-      // Đánh dấu bài viết là "đã xóa"
-      const result = await postModel.del(postID);
-
-      if (result.affectedRows === 0) {
-        req.flash("error", "Không tìm thấy bài viết hoặc không thể xóa.");
-        return res.redirect("/admin/posts");
-      }
-
-      req.flash("success", "Bài viết đã được đánh dấu là đã xóa.");
-      res.redirect("/admin/posts");
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      req.flash("error", "Đã xảy ra lỗi khi xóa bài viết.");
-      res.redirect("/admin/posts");
-    }
+    await postModel.del(id);
+    res.redirect("/admin/posts/");
   } else {
-    res.redirect("/"); // Nếu không có quyền, chuyển về trang chủ
-  }
-});
-
-// Khôi phục bài viết
-router.post("/restore/:id", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
-    try {
-      const postID = +req.params.id || -1;
-
-      // Khôi phục bài viết
-      const result = await postModel.restore(postID);
-
-      if (result.affectedRows === 0) {
-        req.flash("error", "Không tìm thấy bài viết hoặc không thể khôi phục.");
-        return res.redirect("/admin/posts");
-      }
-
-      req.flash("success", "Bài viết đã được khôi phục.");
-      res.redirect("/admin/posts");
-    } catch (error) {
-      console.error("Error restoring post:", error);
-      req.flash("error", "Đã xảy ra lỗi khi khôi phục bài viết.");
-      res.redirect("/admin/posts");
-    }
-  } else {
-    res.redirect("/"); // Nếu không có quyền, chuyển về trang chủ
+    res.redirect("/");
   }
 });
 router.post("/del/:id", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
+  if (req.isAuthenticated() && req.user.Permission === 3) {
+    // Kiểm tra quyền người dùng
+    const id = +req.params.id || -1; // Lấy ID bài viết từ URL
     try {
-      const postID = +req.params.id || -1;
-
-      // Đánh dấu bài viết là đã xóa
-      const result = await postModel.del(postID);
-
-      if (result.affectedRows === 0) {
-        req.flash("error", "Không thể xóa bài viết.");
-        return res.redirect("/admin/posts");
-      }
-
-      req.flash("success", "Bài viết đã được đánh dấu là đã xóa.");
-      res.redirect("/admin/posts");
+      await postModel.del(id); // Gọi hàm xóa bài viết trong model
+      res.redirect("/admin/posts"); // Chuyển hướng sau khi xóa thành công
     } catch (error) {
-      console.error("Error marking post as deleted:", error);
-      req.flash("error", "Đã xảy ra lỗi khi xóa bài viết.");
-      res.redirect("/admin/posts");
+      console.error("Error deleting post:", error);
+      res.status(500).send("An error occurred while deleting the post.");
     }
   } else {
-    res.redirect("/"); // Nếu không có quyền, chuyển về trang chủ
+    res.redirect("/"); // Người dùng không có quyền thì chuyển hướng về trang chủ
+  }
+});
+router.get("/restore/:id", async function (req, res) {
+  if (req.isAuthenticated() && req.user.Permission === 3) {
+    const id = +req.params.id || -1;
+
+    await postModel.restore(id);
+    res.redirect("/admin/posts/");
+  } else {
+    res.redirect("/");
   }
 });
 router.post("/restore/:id", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 1) {
+  if (req.isAuthenticated() && req.user.Permission === 3) {
+    const id = +req.params.id || -1;
     try {
-      const postID = +req.params.id || -1;
-
-      // Khôi phục bài viết
-      const result = await postModel.restore(postID);
-
-      if (result.affectedRows === 0) {
-        req.flash("error", "Không thể khôi phục bài viết.");
-        return res.redirect("/admin/posts");
-      }
-
-      req.flash("success", "Bài viết đã được khôi phục.");
-      res.redirect("/admin/posts");
+      await postModel.restore(id);
+      res.redirect("/admin/posts/");
     } catch (error) {
       console.error("Error restoring post:", error);
-      req.flash("error", "Đã xảy ra lỗi khi khôi phục bài viết.");
-      res.redirect("/admin/posts");
+      res.status(500).send("An error occurred while restoring the post.");
     }
   } else {
-    res.redirect("/"); // Nếu không có quyền, chuyển về trang chủ
-  }
-});
-router.post("/delete-forever/:id", async function (req, res) {
-  if (req.isAuthenticated() && req.user.Permission > 2) {
-    // Chỉ admin cao cấp
-    try {
-      const postID = +req.params.id || -1;
-
-      // Xóa bài viết vĩnh viễn
-      const result = await postModel.del2(postID);
-
-      if (result.affectedRows === 0) {
-        req.flash("error", "Không thể xóa bài viết vĩnh viễn.");
-        return res.redirect("/admin/posts");
-      }
-
-      req.flash("success", "Bài viết đã bị xóa vĩnh viễn.");
-      res.redirect("/admin/posts");
-    } catch (error) {
-      console.error("Error deleting post permanently:", error);
-      req.flash("error", "Đã xảy ra lỗi khi xóa bài viết vĩnh viễn.");
-      res.redirect("/admin/posts");
-    }
-  } else {
-    res.redirect("/"); // Nếu không có quyền, chuyển về trang chủ
+    res.redirect("/");
   }
 });
 

@@ -1,4 +1,4 @@
-{{#section "title"}}Viết bài - {{/section}}
+{{#section "title"}}Viết bài mới - {{/section}}
 {{#section "js"}}
   <script
     src="https://cdn.tiny.cloud/1/skmolnvx35pa80qkbps92m2hd264mqchbtcxpfzqxe08iuuk/tinymce/6/tinymce.min.js"
@@ -16,15 +16,14 @@
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a
-        href="/admin/posts/cat/{{this.category.CID}}"
-      >Chuyên mục {{this.category.CName}}</a></li>
+    <li class="breadcrumb-item"><a href="/admin/posts">Danh sách bài viết</a></li>
     <li class="breadcrumb-item active" aria-current="page">Viết bài</li>
   </ol>
 </nav>
+
 <div class="card">
   <div class="card-body">
-    <form method="post">
+    <form method="post" action="/admin/posts/add">
       <div class="form-group">
         <label for="txtPostTitle">Tiêu đề</label>
         <input
@@ -32,24 +31,11 @@
           id="txtPostTitle"
           name="PostTitle"
           class="form-control"
+          placeholder="Nhập tiêu đề bài viết"
+          required
         />
       </div>
-      <div class="form-group">
-        <label for="txtSCID">Chọn chuyên mục nhỏ</label>
-        <select class="form-control" id="txtSCID" name="SCID">
-          {{#if this.category}}
-            <option value="">Chọn chuyên mục </option>
-            {{#each this.category}}
-              <optgroup label="{{CName}}">
-                {{#each Subcategory}}
-                  <option value="{{SCID}}">{{SCName}}</option>
-                {{/each}}
-              </optgroup>
-            {{/each}}
-          {{/if}}
 
-        </select>
-      </div>
       <div class="form-group">
         <label for="txtSumContent">Nội dung tóm tắt</label>
         <input
@@ -57,8 +43,10 @@
           id="txtSumContent"
           name="SumContent"
           class="form-control"
+          placeholder="Nhập nội dung tóm tắt"
         />
       </div>
+
       <div class="form-group">
         <textarea
           name="Content"
@@ -66,12 +54,21 @@
           class="form-control"
           cols="30"
           rows="10"
+          placeholder="Nhập nội dung bài viết"
         ></textarea>
       </div>
+
       <div class="form-group">
         <label for="txtSource">Nguồn</label>
-        <input type="text" id="txtSource" name="source" class="form-control" />
+        <input
+          type="text"
+          id="txtSource"
+          name="source"
+          class="form-control"
+          placeholder="Nhập nguồn bài viết"
+        />
       </div>
+
       <div class="form-group">
         <label for="txtLinkSource">Link nguồn</label>
         <input
@@ -79,13 +76,30 @@
           id="txtLinkSource"
           name="linksource"
           class="form-control"
+          placeholder="Nhập link nguồn bài viết"
         />
       </div>
+
       <div class="form-group">
-        <button
-          type="submit"
-          class="btn btn-success btn-lg btn-block"
-        >Đăng</button>
+        <input type="checkbox" id="Premium" name="Premium" value="1" />
+        <label for="Premium"><strong><font color="red">Bài viết Premium</font></strong></label>
+      </div>
+
+      <div class="form-group">
+        <label for="txtTimePost">Ngày đăng</label>
+        <input
+          type="datetime-local"
+          class="form-control"
+          id="txtTimePost"
+          name="TimePost"
+        />
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-success btn-lg btn-block">
+          <i class="fa fa-check" aria-hidden="true"></i>
+          Đăng bài
+        </button>
       </div>
     </form>
   </div>
