@@ -158,14 +158,13 @@ router.post("/status/:pid", async function (req, res) {
       const reason = req.body.Reason || ""; // Lý do từ chối (nếu có)
       const timePublic = req.body.TimePublic || null; // Thời gian xuất bản (nếu có)
 
-      // Kiểm tra nếu trạng thái hợp lệ
-      if (![0, 1, 2].includes(newStatus)) { // Duyệt = 0 (chưa duyệt), 1 (từ chối), 2 (đã xuất bản)
-        return res.redirect(`/admin/posts/status/${pid}`);
+      // Kiểm tra trạng thái hợp lệ (1, 2, 3)
+      if (![1, 2, 3].includes(newStatus)) {
+        return res.status(400).send("Trạng thái không hợp lệ.");
       }
 
       // Lấy bài viết từ DB
       const post = await postModel.singleByPostID(pid);
-
       if (!post.length) {
         return res.redirect("/admin/posts");
       }
@@ -175,30 +174,29 @@ router.post("/status/:pid", async function (req, res) {
         PostID: pid,
         Status: newStatus,
         NameStatus: getStatusName(newStatus),
-        Reason: reason,
-        TimePublic: timePublic,
+        Reason: newStatus === 1 ? reason : "", // Chỉ lưu lý do nếu trạng thái là "Bị từ chối"
+        TimePublic: newStatus === 3 ? timePublic : null, // Chỉ lưu thời gian nếu trạng thái là "Đã xuất bản"
       };
-
-      // Thêm bản ghi vào bảng poststatus
       await poststatusModel.add(statusEntry);
-
 
       // Cập nhật trạng thái bài viết trong bảng posts
       const updatedPost = {
-        Duyet: newStatus,  // Cập nhật trạng thái Duyet
-        TimePublic: newStatus === 2 ? timePublic : null,  // Nếu Duyệt là 2, cập nhật TimePublic, nếu không thì là null
+        Duyet: newStatus, // Cập nhật trạng thái Duyet
+        TimePublic: newStatus === 3 ? timePublic : null, // Nếu Duyệt là 3, cập nhật TimePublic
         PostID: pid,
-        StatusPost: newStatus === 2 ? 'Đã xuất bản' : (newStatus === 1 ? 'Bị từ chối' : 'Chưa duyệt') // Cập nhật StatusPost dựa trên Duyet
+        StatusPost: newStatus === 3
+          ? "Đã xuất bản"
+          : newStatus === 1
+          ? "Bị từ chối"
+          : "Đang duyệt", // Cập nhật StatusPost
       };
-
-      // Cập nhật trạng thái bài viết
       await postModel.patch(updatedPost);
 
       // Quay lại trang quản lý bài viết
       res.redirect(`/admin/posts/status/${pid}`);
     } catch (error) {
       console.error("Error updating status:", error);
-      res.redirect("/admin/posts");
+      res.status(500).send("Có lỗi xảy ra.");
     }
   } else {
     res.redirect("/"); // Nếu người dùng không có quyền
@@ -209,13 +207,18 @@ router.post("/status/:pid", async function (req, res) {
 function getStatusName(status) {
   switch (status) {
     case 1:
-      return "Từ chối";
+      return "Bị từ chối";
     case 2:
-      return "Duyệt bài";
+      return "Đang duyệt";
+    case 3:
+      return "Đã xuất bản";
     default:
-      return "Không xác định";
+      return "Chưa duyệt";
   }
 }
+
+
+
 router.get("/edit/:pid", async function (req, res) {
   if (req.isAuthenticated() && req.user.Permission > 1) {
     const pid = +req.params.pid || -1;
