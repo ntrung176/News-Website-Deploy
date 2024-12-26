@@ -1,7 +1,7 @@
 const db = require('../utils/db');
 
 const TBL_CategoryManager = 'categorymanager';
-
+const TBL_CATEGORIES ='categories';
 
 module.exports = {
     showCategoryManagerByUID: function (id) {
@@ -12,6 +12,14 @@ module.exports = {
     },
     setCategoryManager: function (entity) {
         return db.add(TBL_CategoryManager, entity);
+    },
+    allAssigned: function (userID) {
+        return db.load(`
+            SELECT c.* 
+            FROM ${TBL_CATEGORIES} c
+            JOIN ${TBL_CategoryManager} cm ON c.cid = cm.cid
+            WHERE cm.userid = ${userID} AND c.Xoa = 0
+        `);
     },
     delCategoryManagerByUserID: function (id) {
         const condition = {
@@ -25,4 +33,5 @@ module.exports = {
         }
         return db.del(TBL_CategoryManager, condition);
     }
+
 };
