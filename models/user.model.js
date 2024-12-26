@@ -75,4 +75,45 @@ module.exports = {
     };
     return db.del(TBL_USERS, condition);
   },
+
+  // Thêm người dùng mới với Google ID
+  async addGoogleUser(user) {
+    const entity = {
+      googleId: user.googleId,
+      Email: user.Email,
+      Name: user.Name,
+    };
+    return db.add(TBL_USERS, entity);
+  },
+
+  // Tìm người dùng theo Google ID
+  async singleByGoogleId(googleId) {
+    const rows = await db.load(
+      `select * from ${TBL_USERS} where googleId = '${googleId}'`
+    );
+    if (rows.length === 0) return null;
+
+    return rows[0];
+  },
+
+  // Thêm người dùng mới với Facebook ID
+  async addFacebookUser(user) {
+    const entity = {
+      facebookId: user.facebookId,
+      Email: user.Email,
+      Name: user.Name,
+    };
+    return db.add(TBL_USERS, entity);
+  },
+
+  // Tìm người dùng theo Facebook ID
+  singleByFacebookId: async function (facebookId) {
+    const rows = await db.load(
+      `select * from ${TBL_USERS} where facebookId = '${facebookId}'`
+    );
+    if (rows.length === 0) return null;
+  
+    return rows[0];
+  }
+  
 };
