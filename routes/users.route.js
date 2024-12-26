@@ -41,7 +41,7 @@ router.get('/edit/:id', async function(req, res) {
                 user.ChucVu = 'Quản trị viên';
             }
         const category = await categoryModel.all2(id);
-        const categoryManager = await utilsModel.showCategoryManagerByUID(id);
+        const categoryManager = await utilsModel.allAssigned(id);
         for (var i = 0; i < categoryManager.length; i++) {
             const category = await categoryModel.singleByCID(categoryManager[i].CID);
             categoryManager[i].CName = category.CName;
@@ -54,7 +54,7 @@ router.get('/edit/:id', async function(req, res) {
             QWriter: user.Permission === 1,
             QEditor: user.Permission === 2,
             category,
-            categoryManager
+            categoryManager,
         })
     } else {
         res.redirect('/')
@@ -99,7 +99,25 @@ router.post('/edit/setcate/:id', async function (req, res) {
         res.redirect('/')
     }
 })
+router.get('/admin/users/edit/:id', async function (req, res) {
+    if (req.isAuthenticated() && req.user.Permission === 3) {
+        const id = +req.params.id || -1;
+        
+        // Lấy categoryManager từ cơ sở dữ liệu
+        const categoryManager = await utilsModel.getCategoryManager(); // Phương thức lấy danh sách categoryManager
+        
+        // Lấy thông tin user để truyền vào view
+        const user = await utilsModel.getUserById(id);
 
+        // Render view và truyền dữ liệu
+        res.render('admin/users/edit', {
+            user: user,
+            categoryManager: categoryManager // Truyền categoryManager vào view
+        });
+    } else {
+        res.redirect('/');
+    }
+});
 router.post('/edit/unsetcate/:id', async function (req, res) {
     if (req.isAuthenticated() && req.user.Permission === 3) {
         const id = +req.params.id || -1;
