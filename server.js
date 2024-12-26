@@ -3,6 +3,7 @@ const session = require("express-session");
 const exphbs = require("express-handlebars");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
 const hbs_sections = require("express-handlebars-sections");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
@@ -13,6 +14,7 @@ require("dotenv").config();
 
 const app = express();
 
+
 app.use(
   express.urlencoded({
     extended: true,
@@ -20,6 +22,10 @@ app.use(
 );
 
 app.use(express.json());
+
+
+
+
 
 app.engine(
   "hbs",
@@ -72,6 +78,51 @@ const postModel = require("./models/posts.model");
 const _postModel = require("./models/_post.model");
 const commentModel = require("./models/comment.model");
 const userModel = require("./models/user.model");
+
+// Facebook Login
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FB_CLIENT_ID, // Đổi bằng biến môi trường
+      clientSecret: process.env.FB_CLIENT_SECRET, // Đổi bằng biến môi trường
+      callbackURL:
+        process.env.FB_CALLBACK_URL ||
+        "http://localhost:3000/auth/facebook/callback", // Đổi bằng biến môi trường
+      profileFields: ["id", "emails", "name"],
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await userModel.singleByFacebookId(profile.id);
+        if (!user) {
+          // Create new user if not found
+          user = {
+            facebookId: profile.id,
+            Email: profile.emails[0].value,
+            Name: `${profile.name.givenName} ${profile.name.familyName}`,
+          };
+          await userModel.addFacebookUser(user);
+          user = await userModel.singleByFacebookId(profile.id);
+        }
+        return done(null, user);
+      } catch (err) {
+        return done(err, null);
+      }
+    }
+  )
+);
+
+app.get(
+  "/auth/facebook",
+  passport.authenticate("facebook", { scope: ["email"] })
+);
+
+app.get(
+  "/auth/facebook/callback",
+  passport.authenticate("facebook", {
+    successRedirect: "/",
+    failureRedirect: "/dangnhap",
+  })
+);
 
 app.use(async function (req, res, next) {
   const rows = await categoryModel.allforuser();
@@ -244,6 +295,7 @@ app.use("/writerpanel", writerPanelRouter);
 const editorPanelRouter = require("./routes/editorpanel.route");
 app.use("/editorpanel", editorPanelRouter);
 
+
 app
   .route("/dangnhap")
   .get(function (req, res) {
@@ -304,6 +356,7 @@ app.route("/edit").get(function (req, res) {
   res.render("vwAccount/edit");
 });
 
+
 app.get("/quenmatkhau", function (req, res) {
   // Kiểm tra nếu người dùng đã đăng nhập
   if (req.isAuthenticated()) {
@@ -354,12 +407,17 @@ app.post("/quenmatkhau", async (req, res) => {
       .json({ success: false, message: "Có lỗi xảy ra, vui lòng thử lại!" });
   }
 });
-app.route("/search").get(function (req, res) {
-  res.render("search");
-});
-app.route("/edit").get(function (req, res) {
-  res.render("vwAccount/edit");
-});
+  app
+  .route("/search")
+  .get(function (req, res) {
+    res.render("search");
+  });
+  app
+  .route("/edit")
+  .get(function (req, res) {
+    res.render("vwAccount/edit");
+  });
+
 
 app.route("/search").get(function (req, res) {
   res.render("search");
@@ -367,6 +425,7 @@ app.route("/search").get(function (req, res) {
 app.route("/edit").get(function (req, res) {
   res.render("vwAccount/edit");
 });
+
 
 passport.use(
   new LocalStrategy(async function (username, password, done) {
