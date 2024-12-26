@@ -17,14 +17,19 @@ router.get("/new", async function (req, res) {
   for (var i = 0; i < post.length; i++) {
     post[i].Time = moment(post[i].TimePost, "YYYY-MM-DD hh:mm:ss").fromNow();
     const cat_post = await categoryModel.singleByCID(post[i].CID);
-    post[i].CName = cat_post?.CName || "Unknown Category";
-
+    post[i].CName = cat_post.CName;
+    
+    // Check if SCID is not null or undefined
     if (post[i].SCID !== null && post[i].SCID !== undefined) {
       const subcat_post = await subcategoryModel.single2(post[i].SCID);
-      post[i].SCName = subcat_post?.[0]?.SCName || "Unknown Subcategory";
+      if (subcat_post && subcat_post[0]) {
+        post[i].SCName = subcat_post[0].SCName;
+      }
     }
 
-    post[i].Pre = post[i].Premium === 1 ? true : false;
+    if (post[i].Premium === 1) {
+      post[i].Pre = true;
+    }
   }
 
   res.render("_vwPosts/new", {
@@ -62,37 +67,31 @@ router.get("/:id", async function (req, res) {
   const pst = await postModel.singleByPostID(id);
 
   if (!pst || pst.length === 0) {
-    return res.redirect("/admin/posts");
+    return res.redirect("/admin/posts"); // If no post found, redirect
   }
 
   const post = pst[0];
 
-  if (post.Premium === 1) {
-    if (!req.isAuthenticated() || (req.user && req.user.Premium !== 1)) {
-      const premium = true;
-      return res.render("_vwPosts/baiviet", {
-        premium,
-      });
-    }
+  // Ensure 'post' and 'post.Premium' are defined before accessing
+  if (post.Premium === 1 && (!req.isAuthenticated() || req.user.Premium !== 1)) {
+    const premium = true;
+    return res.render("_vwPosts/baiviet", {
+      premium,
+    });
   }
 
   const ufullname = await userModel.singleByUserID(post.UID);
-  post.U_FullName = ufullname?.Fullname || "Unknown User";
+  if (ufullname !== null) {
+    post.U_FullName = ufullname.Fullname;
+  }
 
-  post.Time = moment(post.TimePost, "YYYY-MM-DD hh:mm:ss").format(
-    "hh:mmA DD/MM/YYYY"
-  );
+  post.Time = moment(post.TimePost, "YYYY-MM-DD hh:mm:ss").format("hh:mmA DD/MM/YYYY");
 
   const comment = await commentModel.singleByPostID(id);
-  if (comment && comment.length > 0) {
-    for (var i = 0; i < comment.length; i++) {
-      const u = await userModel.singleByUserID(comment[i].UID);
-      comment[i].username = u?.UserName || "Unknown User";
-      comment[i].Time = moment(
-        comment[i].Date,
-        "YYYY-MM-DD hh:mm:ss"
-      ).fromNow();
-    }
+  for (var i = 0; i < comment.length; i++) {
+    const u = await userModel.singleByUserID(comment[i].UID);
+    comment[i].username = u.UserName;
+    comment[i].Time = moment(comment[i].Date, "YYYY-MM-DD hh:mm:ss").fromNow();
   }
 
   const tincungchuyenmuc = await _postModel.tincungchuyenmuc(post.SCID);
@@ -127,5 +126,6 @@ router.post("/:id", async function (req, res) {
   await commentModel.add(req.body);
   res.redirect("/post/" + id);
 });
+
 
 module.exports = router;
