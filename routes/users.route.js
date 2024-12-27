@@ -42,10 +42,6 @@ router.get('/edit/:id', async function(req, res) {
             }
         const category = await categoryModel.all2(id);
         const categoryManager = await utilsModel.allAssigned(id);
-        for (var i = 0; i < categoryManager.length; i++) {
-            const category = await categoryModel.singleByCID(categoryManager[i].CID);
-            categoryManager[i].CName = category.CName;
-        }
         user.F_DOB = moment(user.DayOfBirth, 'YYYY-MM-DD').format('YYYY-MM-DD');
         res.render('vwAccount/edit', {
             user,
