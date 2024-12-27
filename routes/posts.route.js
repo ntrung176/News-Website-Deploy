@@ -10,6 +10,7 @@ const fs = require('fs');
 const moment = require("moment");
 const userModel = require("../models/user.model");
 const multer = require("multer");
+const sharp = require('sharp');
 moment.locale("vi");
 
 // Helper function to get user name by UID
@@ -528,39 +529,56 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-router.post('/upload/:id', upload.single('fuMain'), (req, res) => {
-  const postID = req.params.PostID;
+router.post('/upload/:id', upload.single('fuMain'), async (req, res) => {
+  const postID = req.params.id; // Lấy ID bài viết từ params
   const uploadedFile = req.file;
 
+  // Kiểm tra file đã tải lên
   if (!uploadedFile) {
-      return res.status(400).send('Không có file nào được chọn');
+    return res.status(400).send('Không có file nào được chọn hoặc định dạng không hợp lệ');
   }
 
-  // Đường dẫn của ảnh cũ (nếu có)
-  const oldImagePath = path.join(__dirname, '..', uploadDir, `${postID}.png`);
+  console.log('File uploaded:', uploadedFile); // Log file để kiểm tra
+
+  const targetFilePath = path.join(uploadDir, `${postID}.png`); // Đường dẫn ảnh mới (định dạng PNG)
+
+  // Đảm bảo thư mục upload tồn tại
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  // Đường dẫn ảnh cũ
+  const oldImagePathPng = path.join(uploadDir, `${postID}.png`);
+  const oldImagePathJpg = path.join(uploadDir, `${postID}.jpg`);
+  const oldImagePathJpeg = path.join(uploadDir, `${postID}.jpeg`);
 
   // Kiểm tra và xóa ảnh cũ nếu tồn tại
-  if (fs.existsSync(oldImagePath)) {
-      fs.unlinkSync(oldImagePath); // Xóa ảnh cũ
-      console.log(`Đã xóa ảnh cũ: ${oldImagePath}`);
+  [oldImagePathPng, oldImagePathJpg, oldImagePathJpeg].forEach((filePath) => {
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath); // Xóa ảnh cũ
+        console.log(`Đã xóa ảnh cũ: ${filePath}`);
+      } catch (error) {
+        console.error(`Lỗi khi xóa ảnh cũ: ${filePath}`, error);
+      }
+    }
+  });
+
+  try {
+    // Chuyển đổi ảnh sang định dạng PNG và lưu vào thư mục dự án
+    await sharp(uploadedFile.path)
+      .png()
+      .toFile(targetFilePath);
+
+    // Xóa file gốc đã tải lên (không còn cần thiết)
+    fs.unlinkSync(uploadedFile.path);
+
+    res.status(200).send('Ảnh đã được tải lên và chuyển đổi thành định dạng PNG.');
+  } catch (error) {
+    console.error('Lỗi khi xử lý ảnh:', error);
+    res.status(500).send('Đã xảy ra lỗi khi xử lý ảnh.');
   }
-
-  // Sau khi xóa ảnh cũ, lưu ảnh mới
-  console.log(`Đã tải lên ảnh mới cho bài viết ID: ${postID}`);
-
-  // Sau khi upload thành công, chuyển hướng hoặc trả về kết quả
-  res.redirect(`/admin/posts/edit/${postID}`); // Ví dụ: quay lại trang chỉnh sửa bài viết
 });
-router.get('/del/:id', async function(req, res) {
-  if (req.isAuthenticated() && req.user.Permission === 3) {
-      const id = +req.params.id || -1;
-
-      await postModel.del(id);
-      res.redirect('/admin/posts/');
-  } else {
-      res.redirect('/')
-  }
-})
 router.post('/del/:id', async function (req, res) {
   if (req.isAuthenticated() && req.user.Permission === 3) { // Kiểm tra quyền người dùng
       const id = +req.params.id || -1; // Lấy ID bài viết từ URL
