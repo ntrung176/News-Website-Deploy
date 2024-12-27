@@ -15,6 +15,18 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
 </head>
 <body>
+    <div class="container" ><div class="row">
+    <div class="col-sm-2 text-center">
+    <a href="/"><img src="/public/images/logo2.PNG" width="100px" height="50px"></a>
+    </div>
+    <div class="col-sm-6" style="margin: auto;">
+    <center>
+    <form class="form-inline" action="/search" method="POST">
+    <input class="form-control mr-sm-2" type="text" name="search" id="search" placeholder="Nhập nội dung tìm kiếm" style="
+    width: 426px;" required>    
+    <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+    </form>
+    </center></div>
 
     <div class="col-sm-3 text-right" style="margin: auto;">
     {{#if lcIsAuthenticated}}     
