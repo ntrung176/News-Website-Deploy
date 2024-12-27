@@ -117,6 +117,7 @@ router.post("/post", upload.single('fileUpload'), async function (req, res) {
   
   req.body.TimePost = time;
   req.body.UID = req.user.UserID;
+  req.body.Premium = req.body.Premium? 1 : 0;
 
   // Thêm bài viết vào cơ sở dữ liệu
   try {
