@@ -1,21 +1,52 @@
-{{#section "title"}}Đăng ký thành viên mới - {{/section}}
+{{#section "title"}}Chỉnh sửa thông tin cá nhân - {{/section}}
 {{#section "js"}}
   <script
     src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"
   ></script>
 
   <script>
-    function isNumber(n) { return /^-?\d+$/.test(n); } function Check() { var
-    username = $('#txtUserName').val().trim(); var pass =
-    $('#txtPassword').val(); var cpass = $('#txtCPassword').val(); var phone =
-    $('#txtPhone').val().trim(); var phonePattern = /^[0-9]{10,15}$/; if
-    (username.length < 5) { alert('Tên người dùng không được dưới 5 kí tự');
-    return false; } if (pass.length < 6) { alert('Mật khẩu không được đặt dưới 6
-    kí tự'); return false; } if (pass !== cpass) { alert('Mật khẩu xác nhận
-    không khớp'); return false; } if (!isNumber(phone)) { alert('Vui lòng nhập
-    lại đúng định dạng số điện thoại'); return false; } if
-    (!phonePattern.test(phone)) { alert('Vui lòng nhập lại đúng định dạng số
-    điện thoại'); return false; } return true; }
+    function isNumber(n) { 
+      return /^-?\d+$/.test(n); 
+    }
+
+    function Check() { 
+      var username = $('#txtUserName').val().trim();
+      var pass = $('#txtPassword').val(); 
+      var cpass = $('#txtCPassword').val(); 
+      var phone = $('#txtPhone').val().trim(); 
+      var phonePattern = /^[0-9]{10,15}$/; 
+
+      if (username.length < 5) { 
+        alert('Tên người dùng không được dưới 5 kí tự'); 
+        return false; 
+      } 
+      if (pass.length < 6) { 
+        alert('Mật khẩu không được đặt dưới 6 kí tự'); 
+        return false; 
+      } 
+      if (pass !== cpass) { 
+        alert('Mật khẩu xác nhận không khớp'); 
+        return false; 
+      } 
+      if (!isNumber(phone)) { 
+        alert('Vui lòng nhập lại đúng định dạng số điện thoại'); 
+        return false; 
+      } 
+      if (!phonePattern.test(phone)) { 
+        alert('Vui lòng nhập lại đúng định dạng số điện thoại'); 
+        return false; 
+      } 
+      return true; 
+    }
+
+    function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const preview = document.getElementById('previewAvatar');
+        preview.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
   </script>
 {{/section}}
 
@@ -23,8 +54,30 @@
   <div class="card-header text-success">
     <strong>Chỉnh sửa Thông tin cá nhân</strong>
   </div>
-  <form method="POST" id="frmEditProfile">
+  <form method="POST" id="frmEditProfile" enctype="multipart/form-data">
     <div class="card-body">
+      <!-- Upload Avatar -->
+      <div class="text-center mb-4">
+        <label for="Avatar"><strong>Ảnh đại diện</strong></label>
+        <div>
+          <!-- Lấy ảnh từ thư mục public/images/avatarUser với tên file là ID người dùng -->
+          <img src="/public/images/avatarUser/{{this.user.UserID}}.jpg" alt="Avatar" class="rounded-circle" id="previewAvatar" width="120" height="120"/>
+          
+        </div>
+        <input
+          type="file"
+          name="Avatar"
+          id="Avatar"
+          class="form-control-file mt-2"
+          accept="image/*"
+          onchange="previewImage(event)"
+        />
+        <small class="form-text text-muted">
+          Lưu ý: Tệp ảnh phải có tên trùng với ID người dùng ({{this.user.UserID}}).
+        </small>
+      </div>
+
+      <!-- Other Personal Info -->
       <div class="form-row">
         <div class="form-group col-md-6">
           <label for="Fullname">Họ và tên</label>
