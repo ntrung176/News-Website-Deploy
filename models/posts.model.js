@@ -86,6 +86,14 @@ module.exports = {
     
       return db.execute(sql, [categoryID, postID]);
     },
+    updateSubcategory: function (postID, subcategoryID) {
+      const sql = `
+        UPDATE ${TBL_POSTS}
+        SET SCID = ?
+        WHERE PostID = ?
+      `;
+      return db.execute(sql, [subcategoryID, postID]);
+    },
     
     del2: function (id) {
       const condition = {

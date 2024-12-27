@@ -11,6 +11,7 @@ const moment = require("moment");
 const userModel = require("../models/user.model");
 const multer = require("multer");
 const sharp = require('sharp');
+const flash = require('connect-flash');
 moment.locale("vi");
 
 // Helper function to get user name by UID
@@ -261,6 +262,7 @@ router.get("/move/:pid", async function (req, res) {
   if (req.isAuthenticated() && req.user.Permission > 1) {
     const pid = +req.params.pid || -1;
     const pst = await postModel.singleByPostID(pid);
+    console.log(req.params);
 
     if (!pst.length) {
       return res.redirect("/admin/posts");
@@ -307,20 +309,19 @@ router.post("/move/:pid/tocat/:cid", async function (req, res) {
     const updateResult = await postModel.updateCategory(pid, cid);
 
     if (updateResult) {
-      req.flash("success", "Post has been moved to the new category.");
-      res.redirect(`/admin/posts/${pid}`);
+      res.redirect(`/admin/posts`);
     } else {
-      req.flash("error", "Failed to move the post.");
       res.redirect(`/admin/posts/${pid}`);
     }
   } else {
     res.redirect("/");  // Redirect if not authenticated or not authorized
   }
 });
+
 router.get("/move/:pid/tocat/:cid", async function (req, res) {
   const pid = +req.params.pid || -1;
   const cid = +req.params.cid || -1;
-
+  console.log(cid);
   if (pid === -1 || cid === -1) {
     return res.status(400).send("Invalid Post ID or Category ID.");
   }
@@ -354,7 +355,7 @@ router.get("/move/:pid/tocat/:cid", async function (req, res) {
 router.get("/move/:pid/tosub/:scid", async function (req, res) {
   const pid = +req.params.pid || -1;
   const scid = +req.params.scid || -1;
-
+  console.log(scid );
   if (pid === -1 || scid === -1) {
     return res.status(400).send("Invalid Post ID or Subcategory ID.");
   }
@@ -388,21 +389,22 @@ router.post("/move/:pid/tosub/:scid", async function (req, res) {
   if (req.isAuthenticated() && req.user.Permission > 1) {
     const pid = +req.params.pid || -1;
     const scid = +req.params.scid || -1;
-
-    const pst = await postModel.updateSubcategory(pid);
+    console.log(req.body);
+    const pst = await postModel.updateSubcategory(pid,scid);
+    const subcategory = await subcategoryModel.getCIDBySCID(scid);
+    const cid = subcategory[0].CID;
 
     if (!pst.length) {
       return res.redirect("/admin/posts");
     }
 
     // Cập nhật SCID cho bài viết
-    const updateResult = await postModel.move(pid, scid);
+    const updateResult = await postModel.updateCategoryAndSubcategory(pid, cid, scid);
 
     if (updateResult) {
-      req.flash("success", "Post has been moved to the new subcategory.");
+
       res.redirect(`/admin/posts/${pid}`);
     } else {
-      req.flash("error", "Failed to move the post.");
       res.redirect(`/admin/posts/${pid}`);
     }
   } else {

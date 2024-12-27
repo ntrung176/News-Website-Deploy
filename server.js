@@ -3,18 +3,32 @@ const session = require("express-session");
 const exphbs = require("express-handlebars");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const FacebookStrategy = require("passport-facebook").Strategy;
 const hbs_sections = require("express-handlebars-sections");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
 const mysql = require("mysql2");
+const flash = require('connect-flash');
 require("express-async-errors");
 
 require("dotenv").config();
 
 const app = express();
+app.use(
+  session({
+    secret: '01012004', // Thay "your-secret-key" bằng một chuỗi bí mật
+    resave: false,             // Không lưu lại session nếu không thay đổi
+    saveUninitialized: true,   // Lưu session ngay cả khi chưa có dữ liệu
+    cookie: { maxAge: 60000 }, // Thời gian tồn tại của cookie (đơn vị: ms)
+  })
+);
+app.use(flash());
 
-
+// Middleware để gán thông báo flash vào `res.locals`
+app.use(function (req, res, next) {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  next();
+});
 app.use(
   express.urlencoded({
     extended: true,
@@ -80,41 +94,7 @@ const commentModel = require("./models/comment.model");
 const userModel = require("./models/user.model");
 
 // Facebook Login
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: process.env.FB_CLIENT_ID, // Đổi bằng biến môi trường
-      clientSecret: process.env.FB_CLIENT_SECRET, // Đổi bằng biến môi trường
-      callbackURL:
-        process.env.FB_CALLBACK_URL ||
-        "http://localhost:3000/auth/facebook/callback", // Đổi bằng biến môi trường
-      profileFields: ["id", "emails", "name"],
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await userModel.singleByFacebookId(profile.id);
-        if (!user) {
-          // Create new user if not found
-          user = {
-            facebookId: profile.id,
-            Email: profile.emails[0].value,
-            Name: `${profile.name.givenName} ${profile.name.familyName}`,
-          };
-          await userModel.addFacebookUser(user);
-          user = await userModel.singleByFacebookId(profile.id);
-        }
-        return done(null, user);
-      } catch (err) {
-        return done(err, null);
-      }
-    }
-  )
-);
 
-app.get(
-  "/auth/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
-);
 
 app.get(
   "/auth/facebook/callback",

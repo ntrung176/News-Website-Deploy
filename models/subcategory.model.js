@@ -53,5 +53,21 @@ module.exports = {
         SCID: id
       }
       return db.del(TBL_SUBCATEGORIES, condition);
+    },
+    updateCategoryAndSubcategory: function (postID, categoryID, subcategoryID) {
+      const sql = `
+        UPDATE posts
+        SET CID = ?, SCID = ?
+        WHERE PostID = ?
+      `;
+      return db.execute(sql, [categoryID, subcategoryID, postID]);
+    },
+    getCIDBySCID: function (subcategoryID) {
+      const sql = `
+        SELECT CID
+        FROM subcategories
+        WHERE SCID = ?
+      `;
+      return db.execute(sql, [subcategoryID]);
     }
 }

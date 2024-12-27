@@ -58,6 +58,7 @@ router.post('/dangky', async function (req, res) {
 
 router.get('/premium', async function (req, res) {
     var today = new Date();
+    console.log(req.user.tien);
     var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     var datetime = date+" "+time;
@@ -75,5 +76,57 @@ router.get('/premium', async function (req, res) {
     await userModel.patch(entity)
     res.redirect('/profile')
 })
+router.post('/premium', async function (req, res) {
+    try {
+        // Lấy thông tin người dùng
+        const user = await userModel.single(req.user.UserID);
+
+        if (!user) {
+            return res.status(404).send("Người dùng không tồn tại.");
+        }
+
+        // Kiểm tra số dư
+        let soDu = parseFloat(user.tien); // Tiền hiện tại trong tài khoản
+        const phiPremium = 99000; // Phí đăng ký Premium
+
+        if (isNaN(soDu)) {
+            return res.status(400).send("Số dư không hợp lệ.");
+        }
+
+        if (soDu < phiPremium) {
+            // Nếu không đủ tiền, thông báo lỗi
+            req.session.message = 'Số dư không đủ để đăng ký Premium!';
+            return res.redirect('/profile');
+        }
+
+        // Tính số dư sau khi trừ phí Premium
+        soDu -= phiPremium;
+
+        // Xử lý thời gian đăng ký và hết hạn Premium
+        const today = new Date();
+        const datetime = today.toISOString().slice(0, 19).replace('T', ' '); // Ngày đăng ký
+        today.setDate(today.getDate() + 7); // Thêm 7 ngày
+        const datetime1 = today.toISOString().slice(0, 19).replace('T', ' '); // Ngày hết hạn
+
+        // Cập nhật thông tin Premium
+        const entity = {
+            UserID: req.user.UserID,
+            HSD: 7,
+            Premium: soDu > 0 ? 1 : 0, // Nếu số dư còn lại lớn hơn 0 thì set Premium = 1, ngược lại = 0
+            NgayDKPremium: datetime,
+            NgayHHPremium: datetime1,
+            tien: soDu, // Cập nhật số dư sau khi trừ phí
+        };
+
+        await userModel.patch(entity);
+
+        // Thông báo thành công
+        req.session.message = 'Đăng ký Premium thành công!';
+        res.redirect('/profile');
+    } catch (error) {
+        console.error("Error while registering for Premium:", error);
+        res.redirect('/profile');
+    }
+});
 
 module.exports = router;
