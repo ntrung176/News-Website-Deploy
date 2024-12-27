@@ -1,127 +1,140 @@
+
 const mysql = require("mysql2");
-require("dotenv").config();
 
-// Kiểm tra các biến môi trường
-const {
-  DB_HOST,
-  DB_USER,
-  DB_PASSWORD,
-  DB_NAME,
-  DB_PORT, // Nếu bạn sử dụng cổng khác ngoài 3306
-} = process.env;
-
-// Xác minh rằng tất cả các biến môi trường cần thiết đã được định nghĩa
-if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_NAME) {
-  console.error("Thiếu các biến môi trường cần thiết trong tệp .env");
-  process.exit(1); // Thoát ứng dụng nếu thiếu biến môi trường
-}
-
-// Tạo kết nối pool với cấu hình đầy đủ
+// Cấu hình kết nối từ biến môi trường
 const pool = mysql.createPool({
-  host: DB_HOST,
-  user: DB_USER,
-  password: DB_PASSWORD,
-  database: DB_NAME,
-  port: DB_PORT || 3306, // Sử dụng cổng mặc định 3306 nếu không được định nghĩa
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "01012004",
+  database: process.env.DB_NAME || "web_data",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 10000, // 10 giây
 });
 
-// Sử dụng promise pool để hỗ trợ async/await
-const promisePool = pool.promise();
+require("dotenv").config();
 
+
+
+
+const query = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+      connection.query(sql, params, (err, results) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve(results);
+          }
+      });
+  });
+};
 module.exports = {
-  // Hàm tải dữ liệu
-  load: async (sql) => {
-    try {
-      const [results] = await promisePool.query(sql);
-      return results;
-    } catch (error) {
-      console.error("Error in load function:", error.message);
-      throw error;
-    }
-  },
+add: function (table, entity) {
+  return new Promise(function (resolve, reject) {
+    const sql = `insert into ${table} set ?`;
+    pool.query(sql, entity, function (error, results) {
+      if (error) {
+        return reject(error);
+      }
 
-  // Hàm thêm dữ liệu
-  add: async (table, entity) => {
-    try {
-      const sql = `INSERT INTO \`${table}\` SET ?`;
-      const [results] = await promisePool.query(sql, entity);
-      return results;
-    } catch (error) {
-      console.error(`Error in add function for table ${table}:`, error.message);
-      throw error;
-    }
-  },
+      resolve(results);
+    });
+  });
+},
+patch: function (table, entity, condition) {
+  return new Promise(function (resolve, reject) {
+    const sql = `update ${table} set ? where ?`;
+    pool.query(sql, [entity, condition], function (error, results) {
+      if (error) {
+        return reject(error);
+      }
 
-  // Hàm cập nhật dữ liệu
-  patch: async (table, entity, condition) => {
-    try {
-      const sql = `UPDATE \`${table}\` SET ? WHERE ?`;
-      const [results] = await promisePool.query(sql, [entity, condition]);
-      return results;
-    } catch (error) {
-      console.error(
-        `Error in patch function for table ${table}:`,
-        error.message
-      );
-      throw error;
-    }
-  },
+      resolve(results);
+    });
+  });
+},
+del: function (table, condition) {
+  return new Promise(function (resolve, reject) {
+    const sql = `delete from ${table} where ?`;
+    pool.query(sql, condition, function (error, results) {
+      if (error) {
+        return reject(error);
+      }
 
-  // Hàm xóa logic
-  del: async (table, condition) => {
-    try {
-      const sql = `UPDATE \`${table}\` SET xoa = 1 WHERE ?`;
-      const [results] = await promisePool.query(sql, condition);
-      return results;
-    } catch (error) {
-      console.error(`Error in del function for table ${table}:`, error.message);
-      throw error;
-    }
-  },
+      resolve(results);
+    });
+  });
+},
+execute: function (sql, params) {
+  return new Promise(function (resolve, reject) {
+    pool.execute(sql, params, function (error, results) {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results);
+    });
+  });
+},
 
-  // Hàm xóa vĩnh viễn
-  del2: async (table, condition) => {
-    try {
-      const sql = `DELETE FROM \`${table}\` WHERE ?`;
-      const [results] = await promisePool.query(sql, condition);
-      return results;
-    } catch (error) {
-      console.error(
-        `Error in del2 function for table ${table}:`,
-        error.message
-      );
-      throw error;
-    }
-  },
+};
+module.exports = {
+  load: function (sql) {
+    return new Promise(function (resolve, reject) {
+      pool.query(sql, function (error, results, fields) {
+        if (error) {
+          return reject(error);
+        }
 
-  // Hàm khôi phục dữ liệu
-  restore: async (table, condition) => {
-    try {
-      const sql = `UPDATE \`${table}\` SET xoa = 0 WHERE ?`;
-      const [results] = await promisePool.query(sql, condition);
-      return results;
-    } catch (error) {
-      console.error(
-        `Error in restore function for table ${table}:`,
-        error.message
-      );
-      throw error;
-    }
+        resolve(results);
+      });
+    });
   },
+  query: query,
+  add: function (table, entity) {
+    return new Promise(function (resolve, reject) {
+      const sql = `insert into ${table} set ?`;
+      pool.query(sql, entity, function (error, results) {
+        if (error) {
+          return reject(error);
+        }
 
-  // Hàm execute SQL với tham số
-  execute: async (sql, params) => {
-    try {
-      const [results] = await promisePool.query(sql, params);
-      return results;
-    } catch (error) {
-      console.error("Error in execute function:", error.message);
-      throw error;
-    }
+        resolve(results);
+      });
+    });
+  },
+  patch: function (table, entity, condition) {
+    return new Promise(function (resolve, reject) {
+      const sql = `update ${table} set ? where ?`;
+      pool.query(sql, [entity, condition], function (error, results) {
+        if (error) {
+          return reject(error);
+        }
+
+        resolve(results);
+      });
+    });
+  },
+  del: function (table, condition) {
+    return new Promise(function (resolve, reject) {
+      const sql = `delete from ${table} where ?`;
+      pool.query(sql, condition, function (error, results) {
+        if (error) {
+          return reject(error);
+        }
+
+        resolve(results);
+      });
+    });
+  },
+  execute: function (sql, params) {
+    return new Promise(function (resolve, reject) {
+      pool.execute(sql, params, function (error, results) {
+        if (error) {
+          return reject(error);
+        }
+        resolve(results);
+      });
+    });
   },
 };
 
@@ -130,7 +143,8 @@ pool.getConnection((err, connection) => {
   if (err) {
     console.error("Database connection failed:", err.message);
   } else {
-    console.log("Connected to MySQL!");
+    console.log("Connected to MySQL on AWS RDS!");
     connection.release(); // Trả lại kết nối vào pool
   }
 });
+
