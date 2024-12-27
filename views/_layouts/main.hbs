@@ -16,34 +16,22 @@
 </head>
 <body>
 
-    <div class="container" ><div class="row">
-    <div class="col-sm-2 text-center">
-    <a href="/"><img src="/public/images/logo2.PNG" width="100px" height="50px"></a>
-    </div>
-    <div class="col-sm-6" style="margin: auto;">
-    <center>
-    <form class="form-inline" action="/search" method="POST">
-    <input class="form-control mr-sm-2" type="text" name="search" id="search" placeholder="Nhập nội dung tìm kiếm" style="
-    width: 426px;" required>    
-    <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
-    </form>
-    </center></div>
     <div class="col-sm-3 text-right" style="margin: auto;">
     {{#if lcIsAuthenticated}}     
         <div class="btn-group">
             <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="/public/images/avatarUser/{{lcAuthUser.UserID}}.jpg" height="24" width="24" class="rounded-circle" alt="">
-                {{lcAuthUser.UserName}}
+                <img src="/public/images/avatarUser/{{lcAuthUser.UserID}}.jpg" height="24" width="24" class="rounded-circle" alt="">{{lcAuthUser.UserName}}
             </button>
-            <div class="dropdown-item border-bottom">
-    <i class="far fa-money-bill-alt"></i>
-    {{#if lcAuthUser.Premium}}
-        Tài khoản Premium <span class="text-warning">⭐</span><br/>
-    {{else}}
-        Tài khoản thường<br/>
-    {{/if}}
-    {{lcAuthUser.tien}} VNĐ
-</div>
+            <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-item border-bottom">
+                    <i class="far fa-money-bill-alt"></i>
+                    {{#if lcAuthUser.Premium}}
+                        Tài khoản Premium <span class="text-warning">⭐</span><br/>
+                    {{else}}
+                        Tài khoản thường<br/>
+                    {{/if}}
+                    {{lcAuthUser.tien}} VNĐ
+                </div>
                 <a class="dropdown-item" href="/profile"><i class="far fa-address-card"></i> Cá nhân</a>
                 {{#if lcWriter}}
                     <a class="dropdown-item" href="/writerpanel"><i class="fas fa-user-cog"></i> Writer Panel</a>
@@ -55,14 +43,14 @@
                     <a class="dropdown-item border-bottom" href="/admin"><i class="fas fa-user-cog"></i> Admin Panel</a>
                 {{/if}}
                 <a href="/dangxuat" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-
             </div>
         </div>
     {{else}}
         <a href="/dangky" class="btn btn-light border text-secondary"><i class="fas fa-user-plus"></i> Đăng ký</a>
         <a href="/dangnhap" class="btn btn-light border text-secondary"><i class="fas fa-user"></i> Đăng nhập</a>
     {{/if}}
-    </div>
+</div>
+
     
     </div>
       </div> 
