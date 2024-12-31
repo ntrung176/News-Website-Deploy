@@ -42,7 +42,11 @@ module.exports = {
     return rows[0];
   },
   single: async function (username) {
-    return db.load(`select * from ${TBL_USERS} where username = ${username}`);
+    const rows = await db.load(
+      `select * from ${TBL_USERS} where username = '${username}'`
+    );
+    if (rows.length === 0) return null;
+    return rows[0];
   },
   patch: function (entity) {
     const condition = {
